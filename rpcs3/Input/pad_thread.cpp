@@ -13,6 +13,7 @@
 #include "Emu/Io/Null/NullPadHandler.h"
 #include "Emu/Io/PadHandler.h"
 #include "Emu/Io/pad_config.h"
+#include "Emu/RSX/Overlays/overlay_quick_settings.h"
 
 LOG_CHANNEL(input_log, "Input");
 
@@ -208,6 +209,17 @@ void pad_thread::ThreadFunc()
 		}
 
 		m_info.now_connect = connected_devices + num_ldd_pad;
+
+		// For global, controller-based hotkey events
+		for (const auto& pad : m_pads)
+			if (pad->m_port_status & CELL_PAD_STATUS_CONNECTED)
+				for (const auto& button : pad->m_buttons)
+					if (button.m_pressed && button.m_outKeyCode == CELL_PAD_CTRL_PS)
+					{
+						input_log.success("PS button finally fucking pressed");
+						rsx::overlays::show_quick_settings();
+						break;
+					}
 
 		// The following section is only reached when a dialog was closed and the pads are still intercepted.
 		// As long as any of the listed buttons is pressed, cellPadGetData will ignore all input (needed for Hotline Miami).

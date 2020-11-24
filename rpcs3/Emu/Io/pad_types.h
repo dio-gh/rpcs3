@@ -44,6 +44,7 @@ enum Digital2Flags
 	CELL_PAD_CTRL_L1 = 0x00000004,
 	CELL_PAD_CTRL_R2 = 0x00000002,
 	CELL_PAD_CTRL_L2 = 0x00000001,
+	CELL_PAD_CTRL_PS = 0x00000100,
 };
 
 enum DeviceCapability
@@ -281,6 +282,7 @@ struct Pad
 	u16 m_press_L2;
 	u16 m_press_R1;
 	u16 m_press_R2;
+	u16 m_press_ps;
 
 	// Except for these...0-1023
 	// ~399 on sensor y is a level non moving controller
@@ -335,6 +337,7 @@ struct Pad
 		, m_press_L2(0)
 		, m_press_R1(0)
 		, m_press_R2(0)
+	    , m_press_ps(0)
 
 		, m_sensor_x(512)
 		, m_sensor_y(399)

@@ -4,6 +4,8 @@
 #include "Input/product_info.h"
 #include "rpcs3qt/gs_frame.h"
 
+#include "../Emu/RSX/Overlays/overlay_quick_settings.h"
+
 #include <QApplication>
 
 LOG_CHANNEL(input_log, "Input");
@@ -248,10 +250,38 @@ void keyboard_pad_handler::processKeyEvent(QKeyEvent* event, bool pressed)
 
 void keyboard_pad_handler::keyPressEvent(QKeyEvent* event)
 {
+	if (event->key() == Qt::Key_Escape)
+	{
+		rsx::overlays::hide_quick_settings();
+		input_log.success("Quick Settings widget disengaged.");
+		event->ignore();
+		return;
+	}
+
+	if (event->modifiers() & Qt::ControlModifier)
+	{
+		switch (event->key())
+		{
+		case Qt::Key_Return:
+		case Qt::Key_Enter:
+			rsx::overlays::show_quick_settings();
+			input_log.success("Quick Settings widget engaged.");
+			event->ignore();
+			return;
+		default:
+			break;
+		}
+	}
+
 	if (event->modifiers() & Qt::AltModifier)
 	{
 		switch (event->key())
 		{
+		case Qt::Key_E:
+			rsx::overlays::toggle_quick_settings();
+			input_log.warning("tried activating widget");
+			event->ignore();
+			return;
 		case Qt::Key_I:
 			m_deadzone_y = std::min(m_deadzone_y + 1, 255);
 			input_log.success("mouse move adjustment: deadzone y = %d", m_deadzone_y);
@@ -692,7 +722,7 @@ bool keyboard_pad_handler::bindPadToDevice(std::shared_ptr<Pad> pad, const std::
 	pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL1, find_key(p_profile->r3),       CELL_PAD_CTRL_R3);
 	pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL1, find_key(p_profile->l3),       CELL_PAD_CTRL_L3);
 	pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL1, find_key(p_profile->select),   CELL_PAD_CTRL_SELECT);
-	pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL2, find_key(p_profile->ps),       0x100/*CELL_PAD_CTRL_PS*/);// TODO: PS button support
+	pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL2, find_key(p_profile->ps),       CELL_PAD_CTRL_PS /*possibly made up*/); // TODO: PS button support
 	//pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL2, 0,                             0x0); // Reserved (and currently not in use by rpcs3 at all)
 	pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL2, find_key(p_profile->square),   CELL_PAD_CTRL_SQUARE);
 	pad->m_buttons.emplace_back(CELL_PAD_BTN_OFFSET_DIGITAL2, find_key(p_profile->cross),    CELL_PAD_CTRL_CROSS);
