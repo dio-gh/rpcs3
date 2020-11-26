@@ -2,6 +2,7 @@ trigger:
   branches:
     include:
       - master
+      - cirrus-test
   tags:
     exclude:
       - '*'
@@ -9,6 +10,7 @@ pr:
   branches:
     include:
       - master
+      - cirrus-test
 jobs:
 - job: Linux_Build
   strategy:
